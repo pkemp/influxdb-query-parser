@@ -372,7 +372,7 @@ export class InfluxDbQueryParser {
 		for (const a of aggregations.split(',')) {
 			const [as, type, field] = a.split(' ');
 			if (as == 'time') {
-				groupBy = (groupBy ? groupBy + ', time(' : 'GROUP BY ') + type + ')';
+				groupBy = (groupBy ? groupBy + ', time(' : 'GROUP BY time(') + type + ')';
 			} else if (as && type && field && /^[a-zA-Z0-9_]*$/.test(field) && types.includes(type)) {
 				agg = (agg ? agg + ', ' : '') + type.toUpperCase() + '(' + field + ') AS ' + as;
 			}

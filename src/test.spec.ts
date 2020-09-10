@@ -107,6 +107,14 @@ class Tester {
 	@test('should create time aggregates')
 	parseAggregate3() {
 		const parser = new InfluxDbQueryParser({ measurements: 'deals' });
+		const parsed = parser.parse('aggregate=time 5m,totalPrice sum price,averagePrice mean price,priceCount count price');
+		const query = parser.createQuery(parsed);
+		assert.equal(query, 'SELECT SUM(price) AS totalPrice, MEAN(price) AS averagePrice, COUNT(price) AS priceCount FROM deals GROUP BY time(5m)');
+	}
+
+	@test('should create time aggregates with grouping')
+	parseAggregate4() {
+		const parser = new InfluxDbQueryParser({ measurements: 'deals' });
 		const parsed = parser.parse('aggregate=owner:time 5m,totalPrice sum price,averagePrice mean price,priceCount count price');
 		const query = parser.createQuery(parsed);
 		assert.equal(query, 'SELECT SUM(price) AS totalPrice, MEAN(price) AS averagePrice, COUNT(price) AS priceCount FROM deals GROUP BY owner, time(5m)');
