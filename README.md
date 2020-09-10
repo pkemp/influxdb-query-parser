@@ -41,6 +41,7 @@ Initialize parser with given options.
 	- `limitKey`: Name of the query parameter for result count limit and skip
 	- `filterKey`: Name of the query parameter for filters
 	- `aggregateKey`: Name of the query parameter for aggregations
+	- `fillKey`: Name of the query parameter for aggregate fill
 
 ### parser.parse(query)
 
@@ -54,8 +55,9 @@ Parses the query parameters into a QueryOptions object.
     - `filter.filters` contains the query string
     - `fields` contains the query projection
     - `sort`, 
-	- `limit` contains the cursor modifiers for paging purposes.
+	- `limit` contains the cursor modifiers for paging purposes
 	- `aggregate` contains the parsed aggregations
+	- `fill` contains the parsed aggregate fill.
 
 #### Filters
 All other query parameters are considered to be filters. Example:
@@ -145,6 +147,13 @@ Where
 - `time` is static key
 top)
 - `duration` is InfluxDB duration (5m = 5 minutes, 3d = 3 days, 4mo = 4 months etc.) ([See InfluxDB Documentation](https://docs.influxdata.com/influxdb/v2.0/reference/flux/language/lexical-elements/#duration-literals))
+
+By default InfluxDB returns null for missing aggregated values. Behaviour can be changed with the `fill` parameter, example:
+
+```
+?aggregate=user:time 5m&fill=previous
+```
+
 
 ### parser.createQuery(queryOptions)
 

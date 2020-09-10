@@ -18,6 +18,7 @@ export interface ParserOptions {
 	limitKey?: string;
 	filterKey?: string;
 	aggregateKey?: string;
+	fillKey?: string;
 }
 
 export interface QueryOptions {
@@ -26,6 +27,7 @@ export interface QueryOptions {
 	limit?: string;
 	fields?: string | Record<string, any>;
 	aggregate: { groupBy: string; agg: string };
+	fill?: string;
 }
 
 export class InfluxDbQueryParser {
@@ -95,6 +97,7 @@ export class InfluxDbQueryParser {
 		{ operator: 'limit', method: this.castLimit, defaultKey: 'limit' },
 		{ operator: 'filter', method: this.castFilter, defaultKey: 'filter' },
 		{ operator: 'aggregate', method: this.castAggregate, defaultKey: 'aggregate' },
+		{ operator: 'fill', method: this.castFill, defaultKey: 'fill' },
 	];
 
 	constructor(private _options: ParserOptions = {}) {
@@ -158,6 +161,7 @@ export class InfluxDbQueryParser {
 		result += qo.sort ? ' ' + qo.sort : '';
 		result += qo.limit ? ' ' + qo.limit : '';
 		result += qo.aggregate && qo.aggregate.groupBy ? ' ' + qo.aggregate.groupBy : '';
+		result += qo.fill ? ' ' + qo.fill : '';
 		return result;
 	}
 
@@ -379,6 +383,21 @@ export class InfluxDbQueryParser {
 		}
 
 		return { groupBy, agg };
+	}
+
+	/**
+	 * cast fill parameter
+	 * fill=100
+	 * =>
+	 * fill(100)
+	 * @param fill
+	 */
+	castFill(fill: string) {
+		let result = '';
+		if (/^[a-z0-9]*$/.test(fill)) {
+			result = 'fill(' + fill + ')';
+		}
+		return result;
 	}
 
 	/**

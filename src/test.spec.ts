@@ -120,6 +120,17 @@ class Tester {
 		assert.equal(query, 'SELECT SUM(price) AS totalPrice, MEAN(price) AS averagePrice, COUNT(price) AS priceCount FROM deals GROUP BY owner, time(5m)');
 	}
 
+	@test('should create time aggregates with grouping and fill')
+	parseAggregate5() {
+		const parser = new InfluxDbQueryParser({ measurements: 'deals' });
+		const parsed = parser.parse('aggregate=owner:time 5m,totalPrice sum price,averagePrice mean price,priceCount count price&fill=previous');
+		const query = parser.createQuery(parsed);
+		assert.equal(
+			query,
+			'SELECT SUM(price) AS totalPrice, MEAN(price) AS averagePrice, COUNT(price) AS priceCount FROM deals GROUP BY owner, time(5m) fill(previous)'
+		);
+	}
+
 	@test('should parse date shortcuts')
 	parseDateShortcuts1() {
 		const parser = new InfluxDbQueryParser({ measurements: 'deals' });
