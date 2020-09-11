@@ -158,10 +158,10 @@ export class InfluxDbQueryParser {
 		const options = this._options;
 		let result = 'SELECT ' + (qo.aggregate?.agg || qo.fields || '*') + ' FROM ' + options.measurements;
 		result += qo.filter.filters ? ' ' + qo.filter.filters : '';
-		result += qo.sort ? ' ' + qo.sort : '';
-		result += qo.limit ? ' ' + qo.limit : '';
 		result += qo.aggregate && qo.aggregate.groupBy ? ' ' + qo.aggregate.groupBy : '';
 		result += qo.fill ? ' ' + qo.fill : '';
+		result += qo.sort ? ' ' + qo.sort : '';
+		result += qo.limit ? ' ' + qo.limit : '';
 		return result;
 	}
 

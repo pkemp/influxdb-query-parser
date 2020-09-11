@@ -131,6 +131,14 @@ class Tester {
 		);
 	}
 
+	@test('should create grouped aggregates with order and limit')
+	parseAggregate6() {
+		const parser = new InfluxDbQueryParser({ measurements: 'deals' });
+		const parsed = parser.parse('aggregate=time 10m,meanSpeed mean speed&fill=previous&sort=time&limit=5');
+		const query = parser.createQuery(parsed);
+		assert.equal(query, 'SELECT MEAN(speed) AS meanSpeed FROM deals GROUP BY time(10m) fill(previous) ORDER BY time LIMIT 5');
+	}
+
 	@test('should parse date shortcuts')
 	parseDateShortcuts1() {
 		const parser = new InfluxDbQueryParser({ measurements: 'deals' });
