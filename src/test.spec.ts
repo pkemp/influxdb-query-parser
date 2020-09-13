@@ -28,7 +28,7 @@ class Tester {
 
 	@test('should parse multiple option query')
 	generalParse3() {
-		const parser = new InfluxDbQueryParser();
+		const parser = new InfluxDbQueryParser({ parseArray: true });
 		const qry = 'author=William,Frederick,Durst';
 		const parsed = parser.parse(qry);
 		assert.strictEqual(parsed.filter.filters, "WHERE (author = 'William' OR author = 'Frederick' OR author = 'Durst')");
@@ -37,9 +37,9 @@ class Tester {
 	@test('should parse built in casters')
 	builtInCastersTest() {
 		const parser = new InfluxDbQueryParser();
-		const qry = 'key1=string(10)&key2=date(2017-10-01)&key3=string(null)&key4=123';
+		const qry = 'key1=string(10)&key2=date(2017-10-01)&key3=string(null)&key4=123&key5=boolean(true)';
 		const parsed = parser.parse(qry);
-		assert.strictEqual(parsed.filter.filters, "WHERE key1 = '10' AND key2 = '2017-10-01T00:00:00.000Z' AND key3 = 'null' AND key4 = 123");
+		assert.strictEqual(parsed.filter.filters, "WHERE key1 = '10' AND key2 = '2017-10-01T00:00:00.000Z' AND key3 = 'null' AND key4 = 123 AND key5 = true");
 	}
 
 	@test('should parse only whitelist fields')
@@ -58,7 +58,7 @@ class Tester {
 
 	@test('should create equal query for filters')
 	parseQuery1() {
-		const parser = new InfluxDbQueryParser({ measurements: 'events' });
+		const parser = new InfluxDbQueryParser({ measurements: 'events', parseBoolean: false });
 		const parsed = parser.parse('startTime>2020-06-16&private=false');
 		const query = parser.createQuery(parsed);
 		assert.equal(query, "SELECT * FROM events WHERE startTime > '2020-06-16' AND private = 'false'");
@@ -66,10 +66,10 @@ class Tester {
 
 	@test('should create equal query for filters, limit and sort')
 	parseQuery2() {
-		const parser = new InfluxDbQueryParser({ measurements: 'events' });
+		const parser = new InfluxDbQueryParser({ measurements: 'events', parseBoolean: true });
 		const parsed = parser.parse('startTime>2020-06-16&private=false&limit=10&sort=startTime');
 		const query = parser.createQuery(parsed);
-		assert.equal(query, "SELECT * FROM events WHERE startTime > '2020-06-16' AND private = 'false' ORDER BY startTime LIMIT 10");
+		assert.equal(query, "SELECT * FROM events WHERE startTime > '2020-06-16' AND private = false ORDER BY startTime LIMIT 10");
 	}
 
 	@test('should create query only for whitelisted fields')

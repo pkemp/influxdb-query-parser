@@ -42,6 +42,8 @@ Initialize parser with given options.
 	- `filterKey`: Name of the query parameter for filters
 	- `aggregateKey`: Name of the query parameter for aggregations
 	- `fillKey`: Name of the query parameter for aggregate fill
+	- `parseArray`: Set to true if you want to automatically split comma seperated strings to array
+	- `parseBoolean`: Set to true if you want to automatically cast true/false to boolean, otherwise you need to use boolean(true) caster
 
 ### parser.parse(query)
 

@@ -3,7 +3,7 @@
 import * as qs from 'querystring';
 import * as Moment from 'moment';
 import * as _ from 'lodash';
-import { escape, toNanoDate } from 'influx';
+import { escape } from 'influx';
 
 export interface ParserOptions {
 	dateFormat?: any;
@@ -19,6 +19,9 @@ export interface ParserOptions {
 	filterKey?: string;
 	aggregateKey?: string;
 	fillKey?: string;
+	// should the parser automatically cast booleans and arrays?
+	parseBoolean?: boolean;
+	parseArray?: boolean;
 }
 
 export interface QueryOptions {
@@ -36,6 +39,7 @@ export class InfluxDbQueryParser {
 	private readonly _builtInCaster = {
 		string: val => String(val),
 		number: val => Number(val),
+		boolean: val => ('' + val).toLowerCase() === 'true',
 		date: val => {
 			const shortcuts = {
 				startOfYear: (key, mod) =>
@@ -190,7 +194,7 @@ export class InfluxDbQueryParser {
 		}
 
 		// cast array
-		if (value.includes(',')) {
+		if (options.parseArray && value.includes(',')) {
 			return value.split(',').map(val => this.parseValue(val, key));
 		}
 
@@ -202,10 +206,10 @@ export class InfluxDbQueryParser {
 		}
 
 		// Match boolean values
-		if (value === 'true') {
+		if (options.parseBoolean && value === 'true') {
 			return true;
 		}
-		if (value === 'false') {
+		if (options.parseBoolean && value === 'false') {
 			return false;
 		}
 
@@ -252,7 +256,7 @@ export class InfluxDbQueryParser {
 						op = op == '!=' ? '!~' : '=~';
 					}
 					result.filters = typeof result.filters == 'string' ? result.filters + ' AND ' : 'WHERE ';
-					if (typeof value == 'number') {
+					if (typeof value == 'number' || typeof value == 'boolean') {
 						result.filters += `${key} ${op} ${value}`;
 					} else {
 						result.filters += `${key} ${op} ${escape.stringLit(value)}`;
