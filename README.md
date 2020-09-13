@@ -87,6 +87,37 @@ Other signs for number and date fields:
 ?price>=1000     // price is larger or equal to 1000
 ```
 
+#### Casters
+Filter values can be casted or modified with special caster functions. Default casters:
+- `date` cast value to date. Caster takes parameters in format `value:modifier?:date?` where value can be a date string or key:
+	- shortcuts: startOfYear, startOfQuarter, startOfMonth, startOfWeek, endOfYear, endOfQuarter, endOfWeek
+	- Examples:
+		- Start of current year: `startOfYear` or `startOfYear:0`
+		- Start of next year: `startOfYear:1`
+		- Start of previous year: `startOfYear:-1`
+	- Optional date parameter can be used for example: `startOfYear:0:2019-10-01` to return start of year for the given date.
+	- Other shortcuts to adjust from current or given date by modifier: year, quarter, month, week, day
+	- Examples: 
+		- `day:2019-10-01:1` to return the next day
+		- `day:-10` date for 10 days ago
+		- `month:1` date for one month to future
+
+- boolean caster to cast parameter to boolean:
+
+```
+?enabled=boolean(true)
+```
+- string caster to explicitly cast parameter to string:
+
+```
+?key=string(123)
+```
+
+- number caster to cast parameter to number:
+
+```
+?key=number(1.34)
+```
 
 #### Fields
 Result fields can be specified in the format:

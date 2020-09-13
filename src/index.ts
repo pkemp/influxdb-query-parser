@@ -42,44 +42,26 @@ export class InfluxDbQueryParser {
 		boolean: val => ('' + val).toLowerCase() === 'true',
 		date: val => {
 			const shortcuts = {
-				startOfYear: (key, mod) =>
-					Moment.utc()
-						.startOf('year')
-						.add(Number(mod || '0'), 'years'),
-				endOfYear: (key, mod) =>
-					Moment.utc()
-						.endOf('year')
-						.add(Number(mod || '0'), 'years'),
-				startOfQuarter: (key, mod) =>
-					Moment.utc()
-						.startOf('quarter')
-						.add(Number(mod || '0'), 'quarters'),
-				endOfQuarter: (key, mod) =>
-					Moment.utc()
-						.endOf('quarter')
-						.add(Number(mod || '0'), 'quarters'),
-				startOfMonth: (key, mod) =>
-					Moment.utc()
-						.startOf('month')
-						.add(Number(mod || '0'), 'months'),
-				endOfMonth: (key, mod) =>
-					Moment.utc()
-						.endOf('month')
-						.add(Number(mod || '0'), 'months'),
-				startOfWeek: (key, mod) =>
-					Moment.utc()
-						.startOf('isoWeek')
-						.add(Number(mod || '0'), 'weeks'),
-				endOfWeek: (key, mod) =>
-					Moment.utc()
-						.endOf('isoWeek')
-						.add(Number(mod || '0'), 'weeks'),
+				startOfYear: (key, mod, date) => date.startOf('year').add(Number(mod || '0'), 'years'),
+				endOfYear: (key, mod, date) => date.endOf('year').add(Number(mod || '0'), 'years'),
+				startOfQuarter: (key, mod, date) => date.startOf('quarter').add(Number(mod || '0'), 'quarters'),
+				endOfQuarter: (key, mod, date) => date.endOf('quarter').add(Number(mod || '0'), 'quarters'),
+				startOfMonth: (key, mod, date) => date.startOf('month').add(Number(mod || '0'), 'months'),
+				endOfMonth: (key, mod, date) => date.endOf('month').add(Number(mod || '0'), 'months'),
+				startOfWeek: (key, mod, date) => date.startOf('isoWeek').add(Number(mod || '0'), 'weeks'),
+				endOfWeek: (key, mod, date) => date.endOf('isoWeek').add(Number(mod || '0'), 'weeks'),
+				year: (key, mod, date) => date.add(Number(mod || '0'), 'years'),
+				quarter: (key, mod, date) => date.add(Number(mod || '0'), 'quarters'),
+				month: (key, mod, date) => date.add(Number(mod || '0'), 'months'),
+				week: (key, mod, date) => date.add(Number(mod || '0'), 'weeks'),
+				day: (key, mod, date) => date.add(Number(mod || '0'), 'days'),
 			};
 			//const [, key, mod] = /(^[a-zA-Z]+$)|^([a-zA-Z]+):(.+)$/.exec(val);
-			const matches = val.match(/^([a-zA-Z]+):?([0-9-.]*)$/);
+			const matches = val.match(/^([a-zA-Z]+):?([0-9-.]*):?([0-9-.]*)$/);
 			if (matches) {
 				if (shortcuts[matches[1]]) {
-					return shortcuts[matches[1]](matches[1], matches[2])
+					const modDate = matches[3] ? Moment.utc(matches[3], this._options.dateFormat) : Moment.utc();
+					return shortcuts[matches[1]](matches[1], matches[2], modDate.isValid() ? modDate : Moment.utc())
 						.toDate()
 						.toISOString();
 				} else {

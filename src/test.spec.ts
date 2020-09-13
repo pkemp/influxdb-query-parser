@@ -164,4 +164,17 @@ class Tester {
 			"SELECT * FROM deals WHERE previousYearStarts = '2019-01-01T00:00:00.000Z' AND previousYearEnds = '2019-12-31T23:59:59.999Z' AND nextMonthStarts = '2020-10-01T00:00:00.000Z' AND nextMonthEnds = '2020-10-30T23:59:59.999Z'"
 		);
 	}
+
+	@test('should parse date shortcuts with specified date')
+	parseDateShortcuts3() {
+		const parser = new InfluxDbQueryParser({ measurements: 'deals' });
+		const parsed = parser.parse(
+			'previousYearStarts=date(startOfYear:-1:2019-10-15)&previousYearEnds=date(endOfYear:-1:2019-10-15)&nextMonthStarts=date(startOfMonth:1:2019-10-15)&nextMonthEnds=date(endOfMonth:1:2019-10-15)&yesterday=date(day:-1:2019-10-15)&tomorrow=date(day:1:2019-10-15)'
+		);
+		const query = parser.createQuery(parsed);
+		assert.equal(
+			query,
+			"SELECT * FROM deals WHERE previousYearStarts = '2018-01-01T00:00:00.000Z' AND previousYearEnds = '2018-12-31T23:59:59.999Z' AND nextMonthStarts = '2019-11-01T00:00:00.000Z' AND nextMonthEnds = '2019-11-30T23:59:59.999Z' AND yesterday = '2019-10-14T00:00:00.000Z' AND tomorrow = '2019-10-16T00:00:00.000Z'"
+		);
+	}
 }
